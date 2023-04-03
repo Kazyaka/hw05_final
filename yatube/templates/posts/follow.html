@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Список авторов</h1>
+  {% include 'includes/switcher.html' %}
+  {% for post in page_obj %}
+    {% with show_all_group_posts_link=True %}
+      {% include 'includes/post_card.html' %}
+    {% endwith %}
+  {% endfor %}
+  {% include 'posts/includes/paginator.html' %}
+{% endblock %}

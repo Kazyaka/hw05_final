@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.core.cache import cache
 
 from posts.models import Group, Post
 
@@ -88,12 +89,13 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
+        cache.clear()
         templates_url_names = {
-            '/group/test-slug/': 'posts/group_list.html',
-            '/profile/Anon/': 'posts/profile.html',
-            f'/posts/{self.post.id}/': 'posts/post_detail.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
+            f'/posts/{self.post.pk}/': 'posts/post_detail.html',
             '/create/': 'posts/create_post.html',
-            f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
+            f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
             '/': 'posts/index.html',
         }
         for address, template in templates_url_names.items():

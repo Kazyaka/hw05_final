@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from ..models import Group, Post, User, Comment
+from ..models import Group, Post, User
 
 SMALL_GIF = (
     b'\x47\x49\x46\x38\x39\x61\x02\x00'

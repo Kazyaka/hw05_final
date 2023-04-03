@@ -1,10 +1,25 @@
 {% extends 'base.html' %}
 {% block title %}
 Профайл пользователя {{ author.get_full_name }}
-{% endblock %}
+{% endblock %} 
 {% block content %}
   <h1>Все посты пользователя {{ author.get_full_name }}: </h1>
   <h3>Всего постов: {{ author.posts.count }} </h3>
+  {% if following %}
+    <a
+      class="btn btn-lg btn-light"
+      href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+    >
+      Отписаться
+    </a>
+  {% else %}
+    <a
+      class="btn btn-lg btn-primary"
+      href="{% url 'posts:profile_follow' author.username %}" role="button"
+    >
+      Подписаться
+    </a>
+  {% endif %}
   {% for post in page_obj %}
   {% with show_all_group_posts_link=True%}
     {% include 'includes/post_card.html' %}
