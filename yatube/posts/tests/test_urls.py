@@ -83,6 +83,16 @@ class PostURLTests(TestCase):
             HTTPStatus.FOUND
         )
 
+    def test_user_try_follow(self):
+        response_authorized = self.authorized_user.get('/follow/')
+        response_not_author = self.guest_client.get('/follow/')
+
+        self.assertEqual(response_authorized.status_code, HTTPStatus.OK)
+        self.assertEqual(
+            response_not_author.status_code,
+            HTTPStatus.FOUND
+        )
+
     def test_404_url_all(self):
         response = self.guest_client.get('/perpetual motion machine/')
 
@@ -97,6 +107,7 @@ class PostURLTests(TestCase):
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
             '/': 'posts/index.html',
+            '/follow/': 'posts/follow.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):

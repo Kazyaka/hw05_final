@@ -1,8 +1,10 @@
 from django.db import models
-
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
+
+NUMBER_OF_POSTS = 15
 
 
 class Group(models.Model):
@@ -54,19 +56,21 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:NUMBER_OF_POSTS]
 
 
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='comments',
+        verbose_name='Пост'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='comments',
+        verbose_name='Автор комментария'
     )
     text = models.TextField(
         default='Текст комментария'
@@ -81,6 +85,8 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created']
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
 
 class Follow(models.Model):
@@ -96,3 +102,11 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Автор'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'user'],
+                name='without_self-subscription'
+            ),
+        ]

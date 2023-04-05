@@ -15,7 +15,6 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text']
-        labels = {'text': 'Текст комментария'}
+        fields = ('text',)
         help_texts = {'text': 'Hапишите ваш комментарий'}
         widgets = {'text': forms.Textarea({'rows': 3})}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Ошибка 505{% endblock %}
+{% block content %}
+  <h1>Ошибка 505</h1>
+  <p>Ошибка сервера. Скоро все починим, попробуйте зайти позднее.</p>
+  <a href="{% url 'posts:index' %}">Идите на главную</a>
+{% endblock %}

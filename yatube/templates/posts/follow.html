@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
+{% block title %}
+  Подписки
+{% endblock %}
 {% block content %}
   <h1>Список авторов</h1>
-  {% include 'includes/switcher.html' %}
+  {% include 'includes/switcher.html' with follow=True %}
   {% for post in page_obj %}
     {% with show_all_group_posts_link=True %}
       {% include 'includes/post_card.html' %}

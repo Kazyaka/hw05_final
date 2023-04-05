@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block title %}Custom 403{% endblock %} 
 {% block content %}
-  <h1>Custom CSRF check error. 403</h1>
+  <h1>Ошибка 403. Доступ запрещен.</h1>
+  <p>Доступ на страницу {{ path }} ограничен.</p>
+  <a href="{% url 'posts:index' %}">Вернитесь на главную</a> 
+
 {% endblock %} 

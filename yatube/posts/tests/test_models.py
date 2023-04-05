@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post
+from ..models import Group, Post, Comment
 
 User = get_user_model()
 
@@ -87,3 +87,39 @@ class GroupModelTest(TestCase):
                 self.assertEqual(
                     help_text, expected_vol
                 )
+
+
+class CommentModelTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text="""Текст поста, это такой текст, который относится к посту""",
+        )
+
+        cls.comment = Comment.objects.create(
+            author=cls.user,
+            post=cls.post,
+            text='Тестовый комментарий'
+        )
+
+    def test_verbose_name(self):
+        """Проверка verbose_name в модели Comment."""
+        field_verboses = {
+            'post': 'Пост',
+            'author': 'Автор комментария',
+            'created': 'Дата и время публикации',
+        }
+        for field, expected_vol in field_verboses.items():
+            with self.subTest(value=field):
+                verbose = self.comment._meta.get_field(field).verbose_name
+                self.assertEqual(
+                    verbose, expected_vol,
+                )
+
+    def test_comments_have_correct_object_names(self):
+        """Проверка, что у модели Comment корректно работает __str__."""
+        models = CommentModelTest.post
+        self.assertEqual(models.text[:15], models.__str__())
