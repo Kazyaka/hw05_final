@@ -3,7 +3,7 @@
   <h1>Последние обновления на сайте</h1>
   {% include 'includes/switcher.html' with index=True %}
   {% load cache %}
-  {% cache 20 index_page with page_obj %}
+  {% cache 20 index_page with page_obj.number %}
     {% for post in page_obj %}
       {% with show_all_group_posts_link=True %}
         {% include 'includes/post_card.html' %}

@@ -110,28 +110,30 @@ class PostPagesTests(TestCase):
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
-        form_data = {
-            'text': 'Текст комма',
-        }
-        self.authorized_client.post(
+        comment_response = self.authorized_client.get(
             reverse(
-                'posts:add_comment',
-                kwargs={'post_id': self.post.pk}),
-            data=form_data,
+                'posts:post_detail', kwargs={'post_id': self.post.pk}
+            )
         )
+        form_fields = {
+            'text': forms.fields.CharField,
+        }
+        for value, expected in form_fields.items():
+            with self.subTest(value=value):
+                form_field = (comment_response.context.get('form').fields.
+                              get(value))
+                self.assertIsInstance(form_field, expected)
+
         response = self.authorized_client.get(
             reverse(
                 'posts:post_detail', kwargs={'post_id': self.post.pk}
             )
         )
-
         first_object = response.context['comments'][0]
-
-        self.assertEqual(first_object.text, 'Текст комма')
+        self.assertEqual(first_object.text, self.comment.text)
         self.assertEqual(first_object.author, self.comment.author)
         self.assertEqual(first_object.post, self.comment.post)
-
-        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(Comment.objects.count(), 1)
 
     def test_edit_post_page_show_correct_context(self):
         """Шаблон edit_post сформирован с правильным контекстом."""
@@ -146,12 +148,6 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-                if value == reverse('posts:post_create'):
-                    self.assertEqual(
-                        response.context['is_edit'], False)
-                else:
-                    self.assertEqual(
-                        response.context['is_edit'], True)
 
     def test_create_post_page_show_correct_context(self):
         """Шаблон create_post сформирован с правильным контекстом."""
@@ -313,8 +309,9 @@ class FollowTest(TestCase):
     def test_user_can_follow(self):
         """Пользователь может подписаться на автора"""
         count = Follow.objects.count()
-        following = Follow.objects.create(user_id=self.follower.id,
-                                          author_id=self.author.id)
+        Follow.objects.create(user_id=self.follower.id,
+                              author_id=self.author.id)
+        following = Follow.objects.all().latest('id')
         self.assertEqual(Follow.objects.count(), count + 1)
         self.assertEqual(following.author, self.author)
         self.assertEqual(following.user, self.follower)
@@ -335,19 +332,14 @@ class FollowTest(TestCase):
                               author_id=self.author.id)
         response = self.follower_is_user.get(
             reverse('posts:follow_index'),
-            follow=True
         )
-        self.assertEqual(self.post, response.context['page_obj'][0])
+        self.assertIn(self.post, response.context['page_obj'].object_list)
 
     def test_view_for_unfollowers(self):
         """Новая запись не появляется в ленте у неподписанных
         на автора пользователей. Состояние ленты до и после выхода поста
         должно быть одинаковым"""
-        len_before = 0
-        Follow.objects.create(user_id=self.follower.id,
-                              author_id=self.author.id)
         response = self.unfollower_is_user.get(
             reverse('posts:follow_index'),
-            follow=True
         )
-        self.assertNotEqual(len_before, len(response.content))
+        self.assertNotIn(self.post, response.context['page_obj'].object_list)

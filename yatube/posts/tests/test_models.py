@@ -96,7 +96,7 @@ class CommentModelTest(TestCase):
         cls.user = User.objects.create_user(username='auth')
         cls.post = Post.objects.create(
             author=cls.user,
-            text="""Текст поста, это такой текст, который относится к посту""",
+            text="Текст поста, это такой текст, который относится к посту",
         )
 
         cls.comment = Comment.objects.create(
@@ -122,4 +122,4 @@ class CommentModelTest(TestCase):
     def test_comments_have_correct_object_names(self):
         """Проверка, что у модели Comment корректно работает __str__."""
         models = CommentModelTest.post
-        self.assertEqual(models.text[:15], models.__str__())
+        self.assertEqual(models.text[:POST_TEXT_LIMIT], models.__str__())

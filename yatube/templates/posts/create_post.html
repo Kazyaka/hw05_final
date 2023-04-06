@@ -31,28 +31,28 @@
     {% csrf_token %}   
     {% for fields in form %}   
       <div class="form-group row my-3 p-3">
-      <label for="{{ field.id_for_label }}">
-      {{ fields.label }}
-      {% if field.field.required %}
-        <span class="required text-danger">*</span>
-      {% endif %}
-      </label>    
-      {{ fields }}
-      {% if fields.help_text %}
-        <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
-        {{ fields.help_text|safe }}
-        </small>
-      {% endif %}
+        <label for="{{ field.id_for_label }}">
+          {{ fields.label }}
+            {% if field.field.required %}
+              <span class="required text-danger">*</span>
+            {% endif %}
+        </label>    
+        {{ fields }}
+          {% if fields.help_text %}
+            <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
+              {{ fields.help_text|safe }}
+            </small>
+          {% endif %}
       </div>
     {% endfor %}
     <div class="d-flex justify-content-end">
-    <button type="submit" class="btn btn-primary">
-  {% if is_edit %}
-    Сохранить
-  {% else %}
-    Добавить
-  {% endif %}
-  </button>
-  </div>
+      <button type="submit" class="btn btn-primary">
+        {% if is_edit %}
+          Сохранить
+         {% else %}
+          Добавить
+        {% endif %}
+      </button>
+    </div>
   </form>
 {% endblock %}

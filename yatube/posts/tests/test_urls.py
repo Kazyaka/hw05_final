@@ -34,22 +34,27 @@ class PostURLTests(TestCase):
         )
 
     def test_home_url_all(self):
+        """Проверка что главная страница доступна всем"""
         response = self.guest_client.get('/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_group_url(self):
+        """Проверка что страница группы доступна всем"""
         response = self.guest_client.get('/group/test-slug/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_profile_url(self):
+        """Проверка что страница профиля автора доступна всем"""
         response = self.guest_client.get('/profile/Anon/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_url(self):
+        """Проверка что страница поста доступна всем"""
         response = self.guest_client.get(f'/posts/{self.post.id}/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_url_author(self):
+        """Проверка что страница редактирования поста доступна автору"""
         response_author = self.authorized_user.get(
             f'/posts/{self.post.id}/edit/'
         )
@@ -58,6 +63,7 @@ class PostURLTests(TestCase):
         )
 
     def test_post_edit_url_all(self):
+        """Проверка что страница редактирования поста недоступна гостю"""
         response_all = self.guest_client.get(
             f'/posts/{self.post.id}/edit/'
         )
@@ -66,6 +72,8 @@ class PostURLTests(TestCase):
         )
 
     def test_post_edit_not_author(self):
+        """Проверка что страница редактирования поста недоступна
+        залогиненному неавтору"""
         response_not_author = self.authorized_not_author_client.get(
             f'/posts/{self.post.id}/edit/'
         )
@@ -74,6 +82,8 @@ class PostURLTests(TestCase):
         )
 
     def test_post_create_url(self):
+        """Проверка что страница создания поста доступна
+        залогиненному пользователю и недоступна гостю"""
         response_authorized = self.authorized_user.get('/create/')
         response_not_author = self.guest_client.get('/create/')
 
@@ -84,6 +94,8 @@ class PostURLTests(TestCase):
         )
 
     def test_user_try_follow(self):
+        """Проверка что ссылка на подписку доступна
+        пользователю и недоступна гостю"""
         response_authorized = self.authorized_user.get('/follow/')
         response_not_author = self.guest_client.get('/follow/')
 
@@ -94,11 +106,13 @@ class PostURLTests(TestCase):
         )
 
     def test_404_url_all(self):
+        """Проверка что страница 404 доступна всем"""
         response = self.guest_client.get('/perpetual motion machine/')
 
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
+        """Проверка что страницы используют коррректные шаблоны"""
         cache.clear()
         templates_url_names = {
             f'/group/{self.group.slug}/': 'posts/group_list.html',
