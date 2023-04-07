@@ -6,6 +6,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.core.cache import cache
 
+from http import HTTPStatus
 
 from ..models import Group, Post, User, Comment, Follow
 
@@ -110,7 +111,7 @@ class PostPagesTests(TestCase):
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
-        comment_response = self.authorized_client.get(
+        response = self.authorized_client.get(
             reverse(
                 'posts:post_detail', kwargs={'post_id': self.post.pk}
             )
@@ -120,15 +121,9 @@ class PostPagesTests(TestCase):
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
-                form_field = (comment_response.context.get('form').fields.
+                form_field = (response.context.get('form').fields.
                               get(value))
                 self.assertIsInstance(form_field, expected)
-
-        response = self.authorized_client.get(
-            reverse(
-                'posts:post_detail', kwargs={'post_id': self.post.pk}
-            )
-        )
         first_object = response.context['comments'][0]
         self.assertEqual(first_object.text, self.comment.text)
         self.assertEqual(first_object.author, self.comment.author)
@@ -148,6 +143,7 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
+                self.assertEqual(response.context['is_edit'], True)
 
     def test_create_post_page_show_correct_context(self):
         """Шаблон create_post сформирован с правильным контекстом."""
@@ -161,6 +157,7 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
+                self.assertEqual(response.context['is_edit'], False)
 
     def test_post_with_group_on_index_page(self):
         """Если при создании поста указать группу,
@@ -308,23 +305,32 @@ class FollowTest(TestCase):
 
     def test_user_can_follow(self):
         """Пользователь может подписаться на автора"""
-        count = Follow.objects.count()
-        Follow.objects.create(user_id=self.follower.id,
-                              author_id=self.author.id)
+        follow_url = reverse('posts:profile_follow',
+                             kwargs={'username': self.author.username})
+        redirect = reverse('posts:profile',
+                           kwargs={'username': self.author.username})
+        count = Follow.objects.all().count()
+        response = self.follower_is_user.get(follow_url)
+        self.assertEqual(HTTPStatus.FOUND, response.status_code)
+
         following = Follow.objects.all().latest('id')
-        self.assertEqual(Follow.objects.count(), count + 1)
+        self.assertEqual(Follow.objects.all().count(), count + 1)
         self.assertEqual(following.author, self.author)
         self.assertEqual(following.user, self.follower)
+        self.assertRedirects(response, redirect)
 
     def test_user_can_unfollow(self):
         """Пользователь может отписаться от автора"""
-        Follow.objects.create(user_id=self.follower.id,
-                              author_id=self.author.id)
-        count_after_follow = Follow.objects.count()
-        self.follower_is_user.get(reverse(
+        reverse('posts:profile_follow',
+                kwargs={'username': self.author.username})
+        count_before_unfollow = Follow.objects.count()
+        redirect = reverse('posts:profile',
+                           kwargs={'username': self.author.username})
+        response = self.follower_is_user.get(reverse(
             'posts:profile_unfollow',
             kwargs={'username': self.author.username}))
-        self.assertEqual(Follow.objects.count(), count_after_follow - 1)
+        self.assertEqual(Follow.objects.count(), count_before_unfollow)
+        self.assertRedirects(response, redirect)
 
     def test_view_for_followers(self):
         """Новая запись появляется в ленте у подписчиков"""
