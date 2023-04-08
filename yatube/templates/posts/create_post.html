@@ -30,9 +30,6 @@
     {% endif %}
     {% csrf_token %}
     {% for field in form %}
-    <!-- fields на строке выше не переделать в field, так как форма перестанет отображаться.
-      Ошибка если поменять название на field в форме: Creating a ModelForm without either the 'fields' attribute or the 'exclude'
-      attribute is prohibited; form PostForm needs updating. -->
       <div class="form-group row my-3 p-3">
         <label for="{{ field.id_for_label }}">
           {{ field.label }}
