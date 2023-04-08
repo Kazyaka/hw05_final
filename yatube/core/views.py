@@ -8,8 +8,9 @@ def page_not_found(request, exception):
 
 
 def permission_denied_view(request, reason=''):
-    return render(request, 'core/403csrf.html', status=403)
+    return render(request, 'core/403csrf.html', status=HTTPStatus.FORBIDDEN)
 
 
 def server_error(request):
-    return render(request, 'core/500.html', status=500)
+    return render(request, 'core/500.html',
+                  status=HTTPStatus.INTERNAL_SERVER_ERROR)

@@ -143,7 +143,7 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-                self.assertEqual(response.context['is_edit'], True)
+        self.assertTrue(response.context['is_edit'])
 
     def test_create_post_page_show_correct_context(self):
         """Шаблон create_post сформирован с правильным контекстом."""
@@ -157,7 +157,7 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-                self.assertEqual(response.context['is_edit'], False)
+        self.assertFalse(response.context['is_edit'])
 
     def test_post_with_group_on_index_page(self):
         """Если при создании поста указать группу,

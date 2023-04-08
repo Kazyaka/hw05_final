@@ -29,21 +29,21 @@
       {% endfor %}
     {% endif %}
     {% csrf_token %}
-    {% for fields in form %}
+    {% for field in form %}
     <!-- fields на строке выше не переделать в field, так как форма перестанет отображаться.
       Ошибка если поменять название на field в форме: Creating a ModelForm without either the 'fields' attribute or the 'exclude'
       attribute is prohibited; form PostForm needs updating. -->
       <div class="form-group row my-3 p-3">
         <label for="{{ field.id_for_label }}">
-          {{ fields.label }}
+          {{ field.label }}
             {% if field.field.required %}
               <span class="required text-danger">*</span>
             {% endif %}
         </label>    
-        {{ fields }}
-          {% if fields.help_text %}
+        {{ field }}
+          {% if field.help_text %}
             <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
-              {{ fields.help_text|safe }}
+              {{ field.help_text|safe }}
             </small>
           {% endif %}
       </div>
